@@ -1,0 +1,31 @@
+<h1>Add record</h1>
+
+<form action="/record" method="POST">
+    <div class="input-field">
+        <input id="user_id" name="user_id" type="text" class="validate" required>
+        <label for="user_id">Enter user id</label>
+        <span class="helper-text" data-error="Enter name"></span>
+    </div>
+
+    <div class="input-field">
+        <input id="category_id" name="category_id" type="text" class="validate" required>
+        <label for="category_id">Enter category id</label>
+        <span class="helper-text" data-error="Enter price"></span>
+    </div>
+
+    <div class="input-field">
+        <input id="date" name="date" type="text" class="validate" required>
+        <label for="date">Enter the date and time the record was created</label>
+        <span class="helper-text" data-error="Enter date"></span>
+    </div>
+
+    <div class="input-field">
+        <input id="amount" name="amount" type="text" class="validate" required>
+        <label for="amount">Enter amount of expense</label>
+        <span class="helper-text" data-error="Enter amount"></span>
+    </div>
+
+    <button class="btn btn-primary">Create record</button>
+</form>
+<br>
+<a class="waves-effect waves-light btn" href="/">back</a>
