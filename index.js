@@ -1,6 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const expHbs = require('express-handlebars')
 const path = require('path')
+const mongoose = require('mongoose')
+const mongoUri = process.env.MONGO_URI
+
 
 const mainRoute = require('./routes/main')
 const userRoute = require('./routes/user')
@@ -34,8 +38,9 @@ app.use('/category', categoryRoute)
 app.use('/record', recordRoute)
 app.use('/records', recordsRoute)
 
-function start() {
+async function start() {
     const PORT = process.env.PORT || 3000
+    await mongoose.connect(mongoUri)
     app.listen(PORT, () => {
         console.log(`Server is running on port : ${PORT}`)
     })
