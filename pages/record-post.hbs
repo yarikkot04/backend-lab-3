@@ -12,17 +12,22 @@
         <label for="category_id">Enter category id</label>
         <span class="helper-text" data-error="Enter price"></span>
     </div>
-
     <div class="input-field">
-        <input id="date" name="date" type="text" class="validate" required>
-        <label for="date">Enter the date and time the record was created</label>
-        <span class="helper-text" data-error="Enter date"></span>
-    </div>
-
-    <div class="input-field">
-        <input id="amount" name="amount" type="text" class="validate" required>
+        <input id="amount" name="amount" type="text" class="validate" step="0.01" pattern="\d+(\.\d{1,2})?" required>
         <label for="amount">Enter amount of expense</label>
         <span class="helper-text" data-error="Enter amount"></span>
+    </div>
+    <label>Currency</label>
+    <div class="input-field">
+        <select class="browser-default" name="currency">
+            <option value="" disabled selected>Choose currency (Optional) </option>
+            <option value="UAH">UAH - Ukrainian hryvnia</option>
+            <option value="USD">USD - U.S. dollar</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="GBP">GBP - British pound</option>
+            <option value="JPY">JPY - Japanese yen</option>
+            <option value="CAD">CAD - Canadian dollar</option>
+        </select>
     </div>
 
     <button class="btn btn-primary">Create record</button>

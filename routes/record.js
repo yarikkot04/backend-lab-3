@@ -1,6 +1,8 @@
 const { Router } = require('express')
 const router = Router()
 const Record = require('../model/record_model')
+const User = require('../model/user_model')
+const { CommonUtils } = require('../utils/CommonUtils')
 
 router.get('/add', (req, res) => {
     res.render('record-post', {
@@ -10,18 +12,33 @@ router.get('/add', (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const userId = req.query.userId
-        const categoryId = req.query.categoryId
-        if (userId && categoryId) {
-            const selectedRecords = await Record.filterByAllParams(userId, categoryId)
+        const user_id = req.query.userId
+        const category_id = req.query.categoryId
+        if (user_id && category_id) {
+            let selectedRecords
+            try {
+                selectedRecords = await Record.find({ user_id, category_id })
+            } catch (e) {
+                selectedRecords = []
+            }
             res.json({ selectedRecords, status: 'a' })
-        } else if (userId && !categoryId) {
-            const selectedRecords = await Record.filterByUserId(userId)
+        } else if (user_id && !category_id) {
+            let selectedRecords
+            try {
+                selectedRecords = await Record.find({ user_id })
+            } catch (e) {
+                selectedRecords = []
+            }
             res.json({ selectedRecords, status: 'u' })
-        } else if (!userId && categoryId) {
-            const selectedRecords = await Record.filterByCategoryId(categoryId)
+        } else if (!user_id && category_id) {
+            let selectedRecords
+            try {
+                selectedRecords = await Record.find({ category_id })
+            } catch (e) {
+                selectedRecords = []
+            }
             res.json({ selectedRecords, status: 'c' })
-        } else if (!userId && !categoryId) {
+        } else if (!user_id && !category_id) {
             const selectedRecords = []
             res.json({ selectedRecords, error: 'Enter search parameters!' })
         }
@@ -33,12 +50,31 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const newRecord = new Record(req.body)
-        const savedRecord = await newRecord.save()
-        if (savedRecord.status !== 1) {
-            res.json(savedRecord.saved)
+        let {
+            user_id,
+            category_id,
+            amount,
+            currency
+        } = req.body
+        const userExistenceStatus = await CommonUtils.verifyUserExistenceById(user_id)
+        const categoryExistenceStatus = await CommonUtils.verifyCategoryExistenceById(category_id)
+        if (!userExistenceStatus) {
+            res.status(404).json({ error: 'The user with this id does not exist' })
+        } else if (!categoryExistenceStatus) {
+            res.status(404).json({ error: 'The category with this id does not exist' })
         } else {
-            res.status(404).json({ error: savedRecord.error })
+            if (!currency) {
+                const user = await User.findById(user_id)
+                currency = user.default_currency
+            }
+            if (!CommonUtils.checkAmountValidity(amount) || !CommonUtils.checkCurrencyValidity(currency)) {
+                res.status(404).json({ error: 'Incorrect currency or amount input format' })
+            }
+            const newRecord = new Record({
+                user_id, category_id, amount, currency
+            })
+            await newRecord.save()
+            res.json(newRecord)
         }
     } catch (e) {
         res.status(404).json({ error: 'Server error!' })

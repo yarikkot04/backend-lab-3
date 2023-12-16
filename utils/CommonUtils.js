@@ -38,6 +38,25 @@ class CommonUtils {
         }
         return true
     }
+    static async verifyCategoryExistenceById(id) {
+        let candidate
+        try {
+            candidate = await Category.findById(id)
+        } catch (e) {
+            candidate = null
+        }
+        if (!candidate) return false
+        return true
+    }
+    static checkAmountValidity(amount) {
+        if (isNaN(+amount)) return false
+        if (amount.includes(',')) return false
+        const amount_decimal_part = amount.split('.')[1]
+        if (amount_decimal_part) {
+            if (amount_decimal_part.length > 2) return false
+        }
+        return true
+    }
 }
 
 module.exports = {
