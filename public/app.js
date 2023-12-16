@@ -3,6 +3,8 @@ const deleteCategoryForm = document.querySelector('#deleteCategory')
 const filterRecordForm = document.querySelector('#filterRecord')
 const deleteRecordForm = document.querySelector('#deleteRecord')
 
+const elems = document.querySelectorAll('select')
+instance = M.FormSelect.getInstance(elems)
 
 if (deleteUserForm) {
     deleteUserForm.addEventListener('submit', (event) => {

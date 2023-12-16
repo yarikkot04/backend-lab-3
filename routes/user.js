@@ -1,6 +1,8 @@
 const { Router } = require('express')
 const router = Router()
 const User = require('../model/user_model')
+const { CommonUtils } = require('../utils/CommonUtils')
+
 
 router.get('/', (req, res) => {
     res.render('user-post', {
@@ -10,9 +12,23 @@ router.get('/', (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const newUser = new User(req.body.name)
-        const savedUser = await newUser.save()
-        res.json(savedUser)
+        let { name, default_currency } = req.body
+        const userStatus = await CommonUtils.checkUsernameByNameNotExists(name)
+        if (!userStatus) {
+            res.status(404).json({ error: 'User with this name already exist!' })
+            return
+        }
+        if (default_currency === undefined) default_currency = 'UAH'
+        if (CommonUtils.checkCurrencyValidity(default_currency)) {
+            const newUser = new User({
+                name,
+                default_currency,
+            })
+            const savedUser = await newUser.save()
+            res.json(savedUser)
+        } else {
+            res.status(404).json({ error: 'Incorrect currency type!' })
+        }
     } catch (e) {
         res.status(404).json({ error: 'Server error!' })
         return
