@@ -45,6 +45,10 @@ router.get('/:id', async (req, res) => {
         }
         res.json(user)
     } catch (e) {
+        if (e.name === 'CastError') {
+            res.status(404).json({ error: 'The user with this id does not exist' })
+            return
+        }
         res.status(404).json({ error: 'Server error!' })
         return
     }
@@ -52,15 +56,20 @@ router.get('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
+        const userExistenceStatus = await CommonUtils.verifyUserExistenceById(req.params.id)
+        if(!userExistenceStatus) {
+            res.status(404).json({ error: 'The user with this id does not exist' })
+            return
+        }
         const id = req.params.id
-        const selectedUser = await User.findById(id)
-        if (!selectedUser) {
+        await User.findByIdAndDelete(id)
+        const users = await User.find()
+        res.json({ users, status: 0 })
+    } catch (e) {
+        if (e.name === 'CastError') {
             res.status(404).json({ error: 'The user with this id does not exist', status: 1 })
             return
         }
-        const users = await User.removeUser(id)
-        res.json({ users, status: 0 })
-    } catch (e) {
         res.status(404).json({ error: 'Server error!' })
         return
     }

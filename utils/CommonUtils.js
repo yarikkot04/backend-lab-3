@@ -19,6 +19,16 @@ class CommonUtils {
         }
         return false
     }
+    static async verifyUserExistenceById(id) {
+        let candidate
+        try {
+            candidate = await User.findById(id)
+        } catch (e) {
+            candidate = null
+        }
+        if (!candidate) return false
+        return true
+    }
 }
 
 module.exports = {
