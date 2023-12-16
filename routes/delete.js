@@ -18,7 +18,7 @@ router.get('/category', (req, res) => {
 })
 
 router.get('/category/error', (req, res) => {
-    res.status(404).json({ error: 'No category with this name exists' })
+    res.status(404).json({ error: 'The category with this id does not exist!' })
 })
 
 router.get('/record', (req, res) => {

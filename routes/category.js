@@ -1,6 +1,7 @@
 const { Router } = require('express')
 const router = Router()
 const Category = require('../model/category_model')
+const { CommonUtils } = require('../utils/CommonUtils')
 
 router.get('/add', (req, res) => {
     res.render('category-post', {
@@ -10,7 +11,7 @@ router.get('/add', (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const categories = await Category.getAll()
+        const categories = await Category.find()
         res.json(categories)
     } catch (e) {
         res.status(404).json({ error: 'Server error!' })
@@ -18,16 +19,19 @@ router.get('/', async (req, res) => {
     }
 })
 
-
 router.post('/', async (req, res) => {
     try {
-        const newCategory = new Category(req.body.name)
-        const savedCategory = await newCategory.save()
-        if(savedCategory.status !== 1) {
-            res.json(savedCategory.saved)
-        } else {
-            res.status(404).json({ error : savedCategory.error})
+        const { name } = req.body
+        const categoryStatus = await CommonUtils.checkCategoryByNameNotExists(name)
+        if (!categoryStatus) {
+            res.status(404).json({ error: 'Category with this name already exist!' })
+            return
         }
+        const newCategory = new Category({
+            name
+        })
+        await newCategory.save()
+        res.json(newCategory)
     } catch (e) {
         res.status(404).json({ error: 'Server error!' })
         return
@@ -36,7 +40,13 @@ router.post('/', async (req, res) => {
 
 router.delete('/', async (req, res) => {
     try {
-        const categories = await Category.removeCategoryByName(req.query.categoryName)
+        const categoryStatus = await CommonUtils.checkCategoryByNameNotExists(req.query.categoryName)
+        if (categoryStatus) {
+            res.status(404).json({ error: 'The category with this id does not exist!' })
+            return
+        }
+        await Category.findOneAndDelete({ name: req.query.categoryName })
+        const categories = await Category.find()
         res.json(categories)
     } catch (e) {
         res.status(404).json({ error: 'Server error!' })

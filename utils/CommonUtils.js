@@ -29,6 +29,15 @@ class CommonUtils {
         if (!candidate) return false
         return true
     }
+    static async checkCategoryByNameNotExists(categoryName) {
+        const categories = await Category.find()
+        for (let i = 0; i < categories.length; i++) {
+            if (categories[i].name === categoryName) {
+                return false
+            }
+        }
+        return true
+    }
 }
 
 module.exports = {
