@@ -85,12 +85,16 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const selectedRecord = await Record.findById(req.params.id)
-        if (selectedRecord.status !== 1) {
-            res.json(selectedRecord)
-        } else {
-            res.status(404).json({ error: selectedRecord.error })
+        if (!selectedRecord) {
+            res.status(404).json({ error: 'The record with this id does not exist' })
+            return
         }
+        res.json(selectedRecord)
     } catch (e) {
+        if (e.name === 'CastError') {
+            res.status(404).json({ error: 'The record with this id does not exist' })
+            return
+        }
         res.status(404).json({ error: 'Server error!' })
         return
     }
@@ -98,9 +102,19 @@ router.get('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
-        const records = await Record.removeRecordById(req.params.id)
+        const recordExistenceStatus = await CommonUtils.verifyRecordExistenceById(req.params.id)
+        if (!recordExistenceStatus) {
+            res.status(404).json({ error: 'The record with this id does not exist', status: 1 })
+            return
+        }
+        await Record.findByIdAndDelete(req.params.id)
+        const records = await Record.find()
         res.json(records)
     } catch (e) {
+        if (e.name === 'CastError') {
+            res.status(404).json({ error: 'The record with this id does not exist', status: 1 })
+            return
+        }
         res.status(404).json({ error: 'Server error!' })
         return
     }

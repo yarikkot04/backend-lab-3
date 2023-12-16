@@ -57,6 +57,16 @@ class CommonUtils {
         }
         return true
     }
+    static async verifyRecordExistenceById(id) {
+        let candidate
+        try {
+            candidate = await Record.findById(id)
+        } catch (e) {
+            candidate = null
+        }
+        if (!candidate) return false
+        return true
+    }
 }
 
 module.exports = {
