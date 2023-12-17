@@ -7,6 +7,7 @@
 
 13 % 3 = 1
 
+### Attached a file with environment variables to the classroom.
 
 ## Instruction
 
